@@ -30,8 +30,8 @@ def ping(address, id_=1, seq=1, data='data'):
             return _result(error=error_msg)
         else:
             packet_data = packet.unpack(recv_packet)
-            response_time = recv_time - send_time
-            return _result(error=None, packet_data, response_time)
+            resp_time = recv_time - send_time
+            return _result(error=None, data=packet_data, time=resp_time)
 
 
 def _send(conn, packet):

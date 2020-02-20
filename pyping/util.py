@@ -3,20 +3,21 @@ import statistics
 
 def result_to_dict(result):
     """
-    turn ping result (which is a namedtuple) into a dict
-    which contains data that only matters for show.
+    turn ping result (a namedtuple) into a dict
+    which contains data that only matters for display.
 
     if the result is an error:
-        error -- the error string
+        error -- error string
     otherwise:
-        time  -- the response time from destination ip address
-        src   -- the source ip address
+        time  -- response time
+        src   -- source ip address
                  (the target server, because the data is from the reply packet)
-        dst   -- the destination ip address
+        dst   -- destination ip address
                  (the local ip, because the data is from the reply packet)
         ttl   -- time to live
-        len   -- the length ot data, count in bytes
+        len   -- length of payload, count in bytes
     """
+
     d_result = dict()
     if result.error:
         d_result['error'] = result.error
@@ -25,7 +26,7 @@ def result_to_dict(result):
         d_result['src']  = result.data.ip_src
         d_result['dst']  = result.data.ip_dst
         d_result['ttl']  = result.data.ip_ttl
-        d_result['len']  = len(result.data.data)
+        d_result['len']  = len(result.data.payload)
     return d_result
 
 
@@ -34,6 +35,7 @@ def results_statistics(results: list):
     accept a list of ping results, calculate the statistics of them,
     returns a dict stores the data
     """
+
     time_list = [r.time for r in results if r.time is not None]
     total_result = len(results)
     valid_result = len(time_list)

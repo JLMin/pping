@@ -6,7 +6,7 @@ This little program contains three files:
 
 - \_packet.py
 
-> This module is responsible for create a ICMP ping packet and unpack recived packet.
+> This module is responsible for create a ICMP ping packet and unpack received packet.
 
 - ping.py
 

@@ -83,7 +83,7 @@ def _checksum(packet):
 
 _PacketData = namedtuple('PacketData',
                          ['ip_src', 'ip_dst', 'ip_ttl',
-                          'type', 'code', 'cksum', 'id', 'seq', 'data'])
+                          'type', 'code', 'cksum', 'id', 'seq', 'payload'])
 
 
 def unpack(packet: bytes):
