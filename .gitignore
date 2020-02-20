@@ -1,0 +1,9 @@
+.vscode
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# custom files
+main.py
