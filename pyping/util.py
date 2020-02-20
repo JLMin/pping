@@ -7,7 +7,7 @@ def result_to_dict(result):
     which contains data that only matters for show.
 
     if the result is an error:
-        error -- error string
+        error -- the error string
     otherwise:
         time  -- the response time from destination ip address
         src   -- the source ip address
@@ -31,7 +31,8 @@ def result_to_dict(result):
 
 def results_statistics(results: list):
     """
-    accept a list of ping results, calculate the statistics of them
+    accept a list of ping results, calculate the statistics of them,
+    returns a dict stores the data
     """
     time_list = [r.time for r in results if r.time is not None]
     total_result = len(results)

@@ -21,17 +21,17 @@ def ping(address, id_=1, seq=1, data='data'):
             send_time = _send(conn, icmp_packet)
             recv_time, recv_packet = _recv(conn)
         except IndexError:
-            return _result('Request timed out.')
+            return _result(error='Request timed out.')
         except (socket.gaierror, OSError) as e:
             try:
                 error_msg = socket.errorTab[e.errno]
             except KeyError:
                 error_msg = f'Unknow error: {e}'
-            return _result(error_msg)
+            return _result(error=error_msg)
         else:
             packet_data = packet.unpack(recv_packet)
             response_time = recv_time - send_time
-            return _result(None, packet_data, response_time)
+            return _result(error=None, packet_data, response_time)
 
 
 def _send(conn, packet):
@@ -51,5 +51,5 @@ def _recv(conn):
 _PingResult = namedtuple('PingResult', ['error', 'data', 'time'])
 
 
-def _result(error, data=None, time=None):
+def _result(error=None, data=None, time=None):
     return _PingResult(error, data, time)

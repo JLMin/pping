@@ -110,5 +110,4 @@ def _icmp_unpack(packet):
 
 
 def verify(packet, v_id, v_seq):
-    return True
-    return False
+    pass
