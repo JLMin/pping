@@ -47,8 +47,8 @@ def stats_string(server_name, results):
     recv = '·' * (10 - (lpct // 10))
     str_packet = f' [{recv}{lost}]'
     # time or error
-    times = u' -> {avg:>3}ms ~ {std:>4}  ↑ {min:>3}ms  ↓ {max:>3}ms'
-    error = u' -> {error}'
+    times = ' -> {avg:>3}ms ~ {std:>4}  ↑ {min:>3}ms  ↓ {max:>3}ms'
+    error = ' -> {error}'
     str_body = error if 'error' in stats else times
     # ----
     full_str = str_header + str_packet + str_body.format(**stats)

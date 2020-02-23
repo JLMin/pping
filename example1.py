@@ -8,11 +8,11 @@ def my_ping(address):
 
     if 'error' in d_result:
         msg = (
-            u'ping >> [{addr}] -> {error}'
+            'ping >> [{addr}] -> {error}'
         ).format(addr=address, **d_result)
     else:
         msg = (
-            u'ping >> [{src}] -> bytes={len} time={time}ms TTL={ttl}'
+            'ping >> [{src}] -> bytes={len} time={time}ms TTL={ttl}'
         ).format(**d_result)
 
     print(msg)
