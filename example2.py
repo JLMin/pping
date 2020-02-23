@@ -24,15 +24,14 @@ SERVERS = [
 def ping_servers(repeat):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(ping_thread, s, repeat) for s in SERVERS]
-        for f in futures:
-            print(f.result())
+    return [f.result() for f in futures]
 
 
 def ping_thread(server, repeat):
     results = list()
     id_ = threading.get_ident()
     for i in range(repeat):
-        result = ping(server[1], id_, i + 1, 'test')
+        result = ping(server[1], id_, i + 1, 'data')
         results.append(result)
         time.sleep(1)
     return stats_string(server[0], results)
@@ -40,16 +39,13 @@ def ping_thread(server, repeat):
 
 def stats_string(server_name, results):
     stats = results_statistics(results)
-    sent = stats['sent']
-    recv = stats['recv']
     # header
-    str_header = f'ping >> {server_name:<10}'
+    str_header = f' {server_name:<10}'
     # packet
-    w = len(str(sent))
-    dots = '.' * (w * 2 + 1)
-    packet_all = f' [{dots}]'
-    packet_bad = f' [{recv:>{w}}/{sent}]'
-    str_packet = packet_all if recv == sent else packet_bad
+    lpct = stats['lpct']
+    lost = ' ' * (lpct // 10)
+    recv = '·' * (10 - (lpct // 10))
+    str_packet = f' [{recv}{lost}]'
     # time or error
     times = u' -> {avg:>3}ms ~ {std:>4}  ↑ {min:>3}ms  ↓ {max:>3}ms'
     error = u' -> {error}'
@@ -59,35 +55,33 @@ def stats_string(server_name, results):
     return full_str
 
 
+def execute(repeat):
+    start_time = time.time()
+    results = ping_servers(repeat)
+    time_cost = time.time() - start_time
+    # summary
+    print()
+    print(*results, sep='\n')
+    dline = '-' * 59
+    total = f'{repeat} ping request(s) were sent to each server'
+    tcost = f'total time cost: {round(time_cost, 3)} seconds'
+    print(f'{dline}\n{total:>58}\n{tcost:>58}\n')
+
+
 def user_input(msg):
-    try:
-        command = input(msg)
-        repeat = int(command)
-        assert repeat > 0
-    except KeyboardInterrupt:
-        sys.exit()
-    except (ValueError, AssertionError):
-        return 0
-    else:
-        return repeat
-
-
-def run_script():
     while True:
-        repeat = user_input('How many pings you want to send?\n> ')
-        if repeat:
-            start_time = time.time()
-            ping_servers(repeat)
-            time_cost = time.time() - start_time
-            # summary
-            print(
-                f'{"-" * 60}\n'
-                f'[{repeat}] ping request(s) were sent to each server.\n'
-                f'Finished in: {round(time_cost, 3)} Seconds.\n'
-            )
-        else:
+        command = input(msg)
+        try:
+            repeat = int(command)
+            assert repeat > 0
+        except KeyboardInterrupt:
+            sys.exit()
+        except (ValueError, AssertionError):
             break
+        else:
+            execute(repeat)
 
 
-if __name__ == '__main__':
-    run_script()
+if __name__ == "__main__":
+    msg = 'How many pings you want to send?\n> '
+    user_input(msg)
