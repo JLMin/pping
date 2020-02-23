@@ -37,19 +37,20 @@ def results_statistics(results: list):
     """
 
     time_list = [r.time for r in results if r.time is not None]
-    total = len(results)
-    valid = len(time_list)
+    send = len(results)
+    recv = len(time_list)
+    lost = send - recv
     stats = dict()
-    stats['sent'] = total
-    stats['recv'] = valid
-    stats['lost'] = total - valid
-    stats['lpct'] = int((total - valid) / total * 100)
+    stats['sent'] = send
+    stats['recv'] = recv
+    stats['lost'] = lost
+    stats['lpct'] = round(lost / send, 2)
     # if all request are timed out, we'll have no packet recivied
-    if valid == 0:
+    if recv == 0:
         stats['error'] = results[0].error
     else:
         stats['avg'] = _second_to_ms(statistics.mean(time_list))
-        stats['std'] = _stdev(statistics.stdev(time_list) if valid > 1 else 0.0)
+        stats['std'] = _stdev(statistics.stdev(time_list) if recv > 1 else 0.0)
         stats['min'] = _second_to_ms(min(time_list))
         stats['max'] = _second_to_ms(max(time_list))
     return stats
