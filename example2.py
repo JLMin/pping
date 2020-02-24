@@ -9,15 +9,16 @@ from pyping.util import results_statistics
 
 Server = namedtuple('Server', ['name', 'address'])
 SERVERS = [
-    # test server
+    # bad server
     Server('badserver1', '0.0.0.0'),
     Server('badserver2', '0.0.0.1'),
     Server('badserver3', '0.0.0.256'),
-    Server('localhost1', 'localhost'),
-    Server('localhost2', '127.0.0.1'),
     # real server
     Server('Google', 'www.google.com'),
-    Server('Baidu', 'www.baidu.com')
+    Server('Baidu', 'www.baidu.com'),
+    # localhost
+    Server('localhost1', 'localhost'),
+    Server('localhost2', '127.0.0.1'),
 ]
 
 
@@ -46,7 +47,7 @@ def stats_string(server_name, results):
     recv = '·' * int((1 - lpct) * 10)
     str_packet = f' [{recv:<10}]'
     # time or error
-    times = ' -> {avg:>3}ms ~ {std:>4}  ↑ {min:>3}ms  ↓ {max:>3}ms'
+    times = ' -> {avg:>3}ms  σ{std:>4}   [{min:>3}ms ~ {max:>3}ms]'
     error = ' -> {error}'
     str_body = error if 'error' in stats else times
     # ----
