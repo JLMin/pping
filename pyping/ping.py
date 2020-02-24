@@ -1,5 +1,6 @@
-import socket
 import select
+import socket
+import sys
 import time
 from collections import namedtuple
 
@@ -23,10 +24,10 @@ def ping(address, id_=1, seq=1, data='data'):
         except IndexError:
             return _result(error='Request timed out.')
         except (socket.gaierror, OSError) as e:
-            try:
+            if sys.platform.lower().startswith("win"):
                 error_msg = socket.errorTab[e.errno]
-            except KeyError:
-                error_msg = f'Unknow error: {e}'
+            else:
+                error_msg = f'Error: {e.errno}'
             return _result(error=error_msg)
         else:
             packet_data = packet.unpack(recv_packet)

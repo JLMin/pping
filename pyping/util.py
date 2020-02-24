@@ -30,7 +30,7 @@ def result_to_dict(result):
     return d_result
 
 
-def results_statistics(results: list):
+def results_statistics(results):
     """
     accept a list of ping results, calculate the statistics of them,
     returns a dict stores the data
