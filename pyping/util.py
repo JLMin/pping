@@ -50,7 +50,7 @@ def results_statistics(results: list):
         stats['error'] = results[0].error
     else:
         stats['avg'] = _second_to_ms(statistics.mean(time_list))
-        stats['std'] = _stdev(statistics.stdev(time_list) if recv > 1 else 0.0)
+        stats['std'] = _stdev(statistics.pstdev(time_list))
         stats['min'] = _second_to_ms(min(time_list))
         stats['max'] = _second_to_ms(max(time_list))
     return stats
