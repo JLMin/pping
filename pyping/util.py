@@ -22,7 +22,7 @@ def result_to_dict(result):
     if result.error:
         d_result['error'] = result.error
     else:
-        d_result['time'] = _second_to_ms(result.time)
+        d_result['time'] = round((result.time) * 1000)
         d_result['src']  = result.data.ip_src
         d_result['dst']  = result.data.ip_dst
         d_result['ttl']  = result.data.ip_ttl
@@ -49,18 +49,8 @@ def results_statistics(results: list):
     if recv == 0:
         stats['error'] = results[0].error
     else:
-        stats['avg'] = _second_to_ms(statistics.mean(time_list))
-        stats['std'] = _stdev(statistics.pstdev(time_list))
-        stats['min'] = _second_to_ms(min(time_list))
-        stats['max'] = _second_to_ms(max(time_list))
+        stats['avg'] = round((statistics.mean(time_list)) * 1000)
+        stats['std'] = round((statistics.pstdev(time_list)) * 1000, 1)
+        stats['min'] = round((min(time_list)) * 1000)
+        stats['max'] = round((max(time_list)) * 1000)
     return stats
-
-
-def _second_to_ms(second):
-    ms = int(round(second, 3) * 1000)
-    return ms
-
-
-def _stdev(std):
-    val = round(std * 1000, 1)
-    return val
