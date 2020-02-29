@@ -14,8 +14,8 @@ def _int_positive(name, value):
 
 def _int_positive_or_zero(name, value):
     # value : int >= 0
-    is_num = isinstance(value, int) and not isinstance(value, bool)
-    if not (is_num and value >= 0):
+    is_int = isinstance(value, int) and not isinstance(value, bool)
+    if not (is_int and value >= 0):
         error = (
             f'Expect the "{name}" to be a non-negative interger, get'
             f': <{type(value).__name__}> \'{value}\''

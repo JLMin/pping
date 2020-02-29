@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-This module handles ICMP and IPv4 headers.
-"""
-
 import struct
 import socket
 from collections import namedtuple

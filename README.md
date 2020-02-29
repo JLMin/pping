@@ -1,11 +1,11 @@
-# piping
+# pping
 
 ## Implemented '**ping**' command by using python
 
 usage:
 
 ```python
-from pyping import ping
+from pping import ping
 
 # simple usage
 result = ping('www.example.com')

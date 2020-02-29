@@ -52,7 +52,5 @@ def _ping_once(conn, address, packet, timeout):
             recv_packet = readable[0].recv(1024)
             rtt = time.time() - send_time
             return Response.valid(packet=recv_packet, rtt=rtt)
-    except IndexError:
-        return Response.timeout()
     except Exception:
-        raise
+        return Response.timeout()
