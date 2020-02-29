@@ -1,56 +1,76 @@
+# -*- coding: utf-8 -*-
+
 import select
 import socket
-import sys
+import threading
 import time
 from collections import namedtuple
 
-import pyping._packet as packet
+from .packet import Icmp
+from .result import Result
 
 
-def ping(address, id_=1, seq=1, data='data'):
-    """
-    send a ping request to a ip address
-    returns a namedtuple (_PingResult) which stores the ping result
-    """
+def ping(address, **kwargs):
+    def prepare_args(data='data', repeat=4, interval=1):
+        return data, repeat, interval
 
-    icmp_packet = packet.pack(id_, seq, data)
+    data, repeat, interval = prepare_args(**kwargs)
+    return _ping(address, data, repeat, interval)
+
+
+def _ping(*, address, data, repeat, interval):
+    id_ = threading.get_ident()
+    result = Result(address)
+    for seq in range(1, repeat + 1):
+        packet = Icmp.pack(id_=id_, seq=seq, data=data)
+        response = _ping_once(address=address, packet=packet)
+        result.append(response)
+        if seq < repeat:
+            time.sleep(interval)
+    return result
+
+
+def _ping_once(*, address, packet):
     with socket.socket(socket.AF_INET,
                        socket.SOCK_RAW,
-                       socket.getprotobyname('icmp')) as conn:
+                       socket.IPPROTO_ICMP) as conn:
         try:
             conn.connect((address, 0))
-            send_time = _send(conn, icmp_packet)
-            recv_time, recv_packet = _recv(conn)
+            send_time = time.time()
+            conn.send(packet)
+            while True:
+                readable, __, __ = select.select([conn], [], [], 1)
+                recv_packet = readable[0].recv(1024)
+                rtt = time.time() - send_time
+                return Response.valid(packet=recv_packet, rtt=rtt)
         except IndexError:
-            return _result(error='Request timed out.')
-        except (socket.gaierror, OSError) as e:
-            if sys.platform.lower().startswith("win"):
-                error_msg = socket.errorTab[e.errno]
-            else:
-                error_msg = f'Error: {e.errno}'
-            return _result(error=error_msg)
-        else:
-            packet_data = packet.unpack(recv_packet)
-            resp_time = recv_time - send_time
-            return _result(error=None, data=packet_data, time=resp_time)
+            return Response.error(err_msg='Request timed out.')
+        except OSError as e_os:
+            try:
+                error_msg = socket.errorTab[e_os.errno]
+            except (AttributeError, KeyError):
+                error_msg = e_os
+            except Exception as e_unknow:
+                error_msg = e_unknow
+            return Response.error(err_msg=error_msg)
+        except Exception as e_unknow:
+            return Response.error(err_msg=e_unknow)
 
 
-def _send(conn, packet):
-    send_time = time.time()
-    conn.send(packet)
-    return send_time
+class Response:
+    _Valid = namedtuple('Response', ['status',
+                                     'src', 'dst', 'ttl',
+                                     'id_', 'seq', 'data',
+                                     'rtt'])
 
+    _Error = namedtuple('Response', ['status', 'error'])
 
-def _recv(conn):
-    while True:
-        readable, __, __ = select.select([conn], [], [], 1)
-        recv_packet = readable[0].recv(1024)
-        recv_time = time.time()
-        return recv_time, recv_packet
+    @staticmethod
+    def valid(*, packet, rtt):
+        ipv4_data = IPv4.unpack(packet[:20])
+        icmp_data = Icmp.unpack(packet[20:])
+        return Response._Valid('OK', *ipv4_data, *icmp_data, rtt)
 
-
-_PingResult = namedtuple('PingResult', ['error', 'data', 'time'])
-
-
-def _result(error=None, data=None, time=None):
-    return _PingResult(error, data, time)
+    @staticmethod
+    def error(*, err_msg):
+        return Response._Error('ERROR', err_msg)
