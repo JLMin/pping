@@ -10,83 +10,86 @@ from .packet import Icmp, IPv4
 class Result:
 
     def __init__(self, address):
-        self.hostname, self.aliaslist, self.ipaddrlist = socket.gethostbyname_ex(address)
+        (self.hostname,
+         self.aliaslist,
+         self.ipaddrlist) = socket.gethostbyname_ex(address)
         self.responses = list()
-        self._valid_times = list()
-        self._all_times = list()
+        self.times = list()
+        self.all_times = list()
 
     def __getitem__(self, key):
         return self.responses[key]
 
     def __str__(self):
-        return '\n'.join(Result.prettify(r) for r in self.responses) + (
-            f'\n\nPing statistics:\n'
-            f'Sent = {self.send}, Received = {self.recv}, Lost = {self.lost}\n'
-            f'Avg = {round(self.avg * 1000)}ms, '
-            f'Min = {round(self.min * 1000)}ms, '
-            f'Max = {round(self.max * 1000)}ms, '
-            f'Std = {round(self.stdev * 1000,1)}'
+        return '\n'.join(Result._prettify(r) for r in self.responses) + (
+            f'\n\nPing statistics for {self.hostname}:\n'
+            f'\tPackets: Sent = {self.sent}, '
+            f'Received = {self.recv}, '
+            f'Lost = {self.lost} ({round(self.lost / self.sent * 100)}% loss)\n'
+            f'Approximate round trip times in milli-seconds:\n'
+            f'\tAverage = {round(self.avg * 1000)}ms, '
+            f'Minimum = {round(self.min * 1000)}ms, '
+            f'Maximum = {round(self.max * 1000)}ms, '
+            f'Stdev = {round(self.stdev * 1000,1)}'
         )
 
     @staticmethod
-    def prettify(resp):
-        return (
-            f'Reply from {resp.src}: bytes={resp.size} '
-            f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
-        )
+    def _prettify(resp):
+        if resp.status == Response.OK:
+            return (
+                f'Reply from {resp.src}: bytes={resp.size} '
+                f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
+            )
+        else:
+            return 'Request timed out.'
 
     @property
     def max(self):
         try:
-            return max(self._valid_times)
+            return max(self.times)
         except ValueError:
             return 0
 
     @property
     def min(self):
         try:
-            return min(self._valid_times)
+            return min(self.times)
         except ValueError:
             return 0
 
     @property
     def avg(self):
         try:
-            return statistics.mean(self._valid_times)
+            return statistics.mean(self.times)
         except statistics.StatisticsError:
             return 0
 
     @property
     def stdev(self):
         try:
-            return statistics.pstdev(self._valid_times)
+            return statistics.pstdev(self.times)
         except statistics.StatisticsError:
             return 0
 
     @property
-    def send(self):
+    def sent(self):
         return len(self.responses)
 
     @property
     def recv(self):
-        return len(self._valid_times)
+        return len(self.times)
 
     @property
     def lost(self):
-        return len(self.responses) - len(self._valid_times)
+        return len(self.responses) - len(self.times)
 
     def append(self, response):
         if response.status == Response.OK:
-            self._valid_times.append(response.rtt)
-            self._all_times.append(response.rtt)
+            self.times.append(response.rtt)
+            self.all_times.append(response.rtt)
         else:
-            self._all_times.append(None)
+            self.all_times.append(None)
         self.responses.append(response)
-
-    def to_dict(self):
-        d = dict()
-        d['send'] = self.send
-        return d
 
 
 class Response:
