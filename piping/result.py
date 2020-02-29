@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import statistics
+import socket
+from collections import namedtuple
+
+from .packet import Icmp, IPv4
 
 
 class Result:
 
     def __init__(self, address):
+        self.hostname, self.aliaslist, self.ipaddrlist = socket.gethostbyname_ex(address)
         self.responses = list()
         self.times = list()
         self.rtts = list()
-        self.status = 'ERROR'
-        self.error = None
 
     def __getitem__(self, key):
         return self.responses[key]
@@ -65,13 +68,10 @@ class Result:
         return len(self.responses) - len(self.times)
 
     def append(self, response):
-        if response.status == 'OK':
-            self.status = 'OK'
-            rtt = response.rtt
-            self.times.append(rtt)
-            self.rtts.append(rtt)
+        if response.status == Response.OK:
+            self.times.append(response.rtt)
+            self.rtts.append(response.rtt)
         else:
-            self.error = response.error
             self.rtts.append(None)
         self.responses.append(response)
 
@@ -79,3 +79,25 @@ class Result:
         d = dict()
         d['send'] = self.send
         return d
+
+
+class Response:
+
+    OK = 'ok'
+    TIMEDOUT = 'timedout'
+
+    _Valid = namedtuple('Response', ['status', 'src', 'dst',
+                                     'ttl', 'seq', 'rtt'])
+
+    _Error = namedtuple('Response', ['status'])
+
+    @staticmethod
+    def valid(*, packet, rtt):
+        ipv4_data = IPv4.unpack(packet[:20])
+        icmp_data = Icmp.unpack(packet[20:])
+        return Response._Valid(Response.OK, ipv4_data.src, ipv4_data.dst,
+                               ipv4_data.ttl, icmp_data.seq, rtt)
+
+    @staticmethod
+    def timeout():
+        return Response._Error(Response.TIMEDOUT)

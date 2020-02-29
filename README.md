@@ -1,19 +1,20 @@
-# pyping
+# piping
 
-## Implemented '**ping**' command by using python.
+## Implemented '**ping**' command by using python
 
-This little program contains three files:
+usage:
 
-- \_packet.py
+```python
+from pyping import ping
 
-> This module is responsible for create a ICMP ping packet and unpack received packet.
+# simple usage
+result = ping('www.example.com')
 
-- ping.py
-
-> This module is responsible for sending and reciving packets.
-
-- util.py
-
-> This module provides some examples of how to manipulate the resulting data.
-
-Also there are 2 example scrpits to show case how to use this program.
+# full arguments (default value)
+result = ping('www.example.com',
+              repeat=4,    # Number of echo requests to send.
+              interval=1,  # Time in seconds interval between each request.
+              size=32,     # Send buffer size in bytes.
+              timeout=1,   # Timeout in seconds to wait for each reply.
+              ttl=128)     # Time To Live.
+```
