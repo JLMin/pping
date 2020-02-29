@@ -1,6 +1,6 @@
 # pping
 
-## Implemented '**ping**' command by using python
+## **ping** in python
 
 usage:
 
