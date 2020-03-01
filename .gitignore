@@ -112,4 +112,5 @@ dmypy.json
 ### custom ###
 .vscode
 tests
+todo
 main.py

@@ -11,13 +11,12 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/JLMin/pping',
-    keywords="ping icmp socket",
     license='MIT',
     packages=find_packages(),
     classifiers=[
-        'Programming Language :: Python :: 3',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
-        'Operating System :: Microsoft :: Windows'
+        'Programming Language :: Python :: 3'
     ],
     python_requires='>=3.6',
 )

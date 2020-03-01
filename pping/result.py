@@ -11,8 +11,8 @@ class Result:
 
     def __init__(self, address):
         (self.hostname,
-         self.aliaslist,
-         self.ipaddrlist) = socket.gethostbyname_ex(address)
+         self.hostalias,
+         self.iplist) = socket.gethostbyname_ex(address)
         self.responses = list()
         self.times = list()
         self.all_times = list()
@@ -32,6 +32,9 @@ class Result:
             f'Maximum = {round(self.max * 1000)}ms, '
             f'Stdev = {round(self.stdev * 1000,1)}'
         )
+
+    def __repr__(self):
+        return self.__str__()
 
     @staticmethod
     def _prettify(resp):
