@@ -1,17 +1,21 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+about = {}
+with open('pping/__about__.py', encoding='utf8') as f:
+    exec(f.read(), about)
+
+with open('README.md', encoding='utf8') as f:
+    readme = f.read()
 
 setup(
-    name='pping',
-    version='0.0.1',
-    author='JLMin',
-    description='ping in python',
-    long_description=long_description,
+    name=about['__name'],
+    version=about['__version'],
+    author=about['__author'],
+    description=about['__description'],
+    long_description=readme,
     long_description_content_type='text/markdown',
-    url='https://github.com/JLMin/pping',
-    license='MIT',
+    url=about['__url'],
+    license=about['__license'],
     packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',
