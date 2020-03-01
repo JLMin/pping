@@ -1,8 +1,14 @@
 # pping
 
-## **ping** in python
+**ping** in python
 
-usage:
+## Installing
+
+```python
+pip install pping
+```
+
+## Usage
 
 ```python
 from pping import ping
@@ -37,3 +43,7 @@ result.sent
 result.recv
 result.lost
 ```
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details
