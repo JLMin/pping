@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys
+
 import select
 import socket
 import threading
@@ -29,30 +29,26 @@ def ping(address, repeat=4, interval=1, size=32, timeout=1, ttl=128):
         except OSError as e:
             print(f'An error occurred while connecting to: [{address}]\n{e}')
             return None
-        except Exception:
-            raise
         else:
             id_ = threading.get_ident()
             result = Result(address)
             for seq in range(1, repeat + 1):
                 packet = Icmp.pack(id_=id_, seq=seq, size=size)
-                response = _ping_once(conn, address, packet, timeout)
+                response = _ping_once(conn, packet, timeout)
                 result.append(response)
                 if seq < repeat:
                     time.sleep(interval)
             return result
 
 
-def _ping_once(conn, address, packet, timeout):
+def _ping_once(conn, packet, timeout):
     try:
         send_time = time.time()
         conn.send(packet)
         while True:
-            readable, __, __ = select.select([conn], [], [], timeout)
+            readable, _, _ = select.select([conn], [], [], timeout)
             recv_packet = readable[0].recv(1024)
             rtt = time.time() - send_time
             return Response.valid(packet=recv_packet, rtt=rtt)
     except IndexError:
         return Response.timeout()
-    except Exception:
-        raise

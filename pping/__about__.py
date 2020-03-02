@@ -1,6 +1,0 @@
-__name        = 'pping'
-__version     = '0.0.3'
-__author      = 'JLMin'
-__description = 'ping in python'
-__url         = 'https://github.com/JLMin/pping'
-__license     = 'MIT'

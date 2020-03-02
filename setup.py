@@ -1,21 +1,20 @@
-from setuptools import setup, find_packages
+# -*- coding: utf-8 -*-
 
-about = {}
-with open('pping/__about__.py', encoding='utf8') as f:
-    exec(f.read(), about)
+from setuptools import setup, find_packages
+from pping import ABOUT
 
 with open('README.md', encoding='utf8') as f:
     readme = f.read()
 
 setup(
-    name=about['__name'],
-    version=about['__version'],
-    author=about['__author'],
-    description=about['__description'],
+    name=ABOUT['name'],
+    version=ABOUT['version'],
+    author=ABOUT['author'],
+    description=ABOUT['description'],
+    url=ABOUT['url'],
+    license=ABOUT['license'],
     long_description=readme,
     long_description_content_type='text/markdown',
-    url=about['__url'],
-    license=about['__license'],
     packages=find_packages(),
     classifiers=[
         'Development Status :: 4 - Beta',

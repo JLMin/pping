@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import struct
 import socket
 from collections import namedtuple
@@ -85,7 +86,7 @@ class IPv4:
         f_id = 1
         f_flags = 0
         f_proto = 1  # ICMP
-        f_cksum  = 0
+        f_cksum = 0
         # args
         v_ttl = int(ttl) & 0xff
         v_src = socket.inet_aton(src)
