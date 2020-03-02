@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-
-
 import select
 import socket
-import threading
 import time
 from collections import namedtuple
 
@@ -18,20 +14,16 @@ class Request:
                            socket.SOCK_RAW,
                            socket.IPPROTO_ICMP) as conn:
             conn.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
+            result = list()
             try:
                 conn.connect((address, 0))
             except OSError as e:
-                err_msg = (
-                    f'An error occurred while connecting to: [{address}]\n'
-                    f'> {e}'
-                )
-                print(err_msg)
-                return None
+                response = Response.error(str(e))
+                result.append(response)
+                return result
             else:
-                id_ = threading.get_ident()
-                result = list()
                 for seq in range(1, repeat + 1):
-                    packet = Icmp.pack(id_=id_, seq=seq, size=size)
+                    packet = Icmp.pack(id_=id(conn), seq=seq, size=size)
                     response = Request.ping_once(conn, packet, timeout)
                     result.append(response)
                     if seq < repeat:
@@ -45,21 +37,21 @@ class Request:
             conn.send(packet)
             while True:
                 readable, _, _ = select.select([conn], [], [], timeout)
-                recv_packet = readable[0].recv(1024)
+                reply = readable[0].recv(1024)
                 rtt = time.time() - send_time
-                return Response.valid(packet=recv_packet, rtt=rtt)
+                return Response.valid(packet=reply, rtt=rtt)
         except IndexError:
             return Response.timeout()
 
 
 class Response:
 
-    OK, TIMEDOUT = 'ok', 'timedout'
+    OK, TIMEDOUT, ERROR = 'ok', 'timedout', 'error'
 
     _Valid = namedtuple('Response', ['status', 'src', 'dst', 'ttl',
                                      'size', 'seq', 'rtt'])
 
-    _Error = namedtuple('Response', ['status'])
+    _Error = namedtuple('Response', ['status', 'error'])
 
     @staticmethod
     def valid(*, packet, rtt):
@@ -70,4 +62,8 @@ class Response:
 
     @staticmethod
     def timeout():
-        return Response._Error(Response.TIMEDOUT)
+        return Response._Error(Response.TIMEDOUT, 'Request timed out.')
+
+    @staticmethod
+    def error(err_msg):
+        return Response._Error(Response.ERROR, err_msg)

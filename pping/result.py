@@ -33,21 +33,24 @@ class Result:
         self.stdev = statistics.pstdev(self.times) if self.times else 0
 
     def __str__(self):
-        return '\n'.join(Result._prettify(r) for r in self.responses) + (
-            f'\n\nPing statistics for {self.hostname}:\n'
-            f'\tPackets: Sent = {self.sent}, '
-            f'Received = {self.recv}, '
-            f'Lost = {self.lost} ({round(self.lost / self.sent * 100)}% loss)\n'
-            f'Approximate round trip times in milli-seconds:\n'
-            f'\tAverage = {round(self.avg * 1000)}ms, '
-            f'Minimum = {round(self.min * 1000)}ms, '
-            f'Maximum = {round(self.max * 1000)}ms, '
-            f'Stdev = {round(self.stdev * 1000,1)}'
-        )
+        if self.recv > 0:
+            return '\n'.join(Result._prettify(r) for r in self.responses) + (
+                f'\n\nPing statistics for {self.hostname}:\n'
+                f'\tPackets: Sent = {self.sent}, '
+                f'Received = {self.recv}, '
+                f'Lost = {self.lost} ({round(self.lost / self.sent * 100)}% loss)\n'
+                f'Approximate round trip times in milli-seconds:\n'
+                f'\tAverage = {round(self.avg * 1000)}ms, '
+                f'Minimum = {round(self.min * 1000)}ms, '
+                f'Maximum = {round(self.max * 1000)}ms, '
+                f'Stdev = {round(self.stdev * 1000,1)}'
+            )
+        else:
+            return self.responses[0].error
 
     def __repr__(self):
         return (
-            f'[{self.hostname}] > '
+            f'{self.__class__.__name__} of [{self.hostname}] > '
             f'{round(self.avg * 1000)}ms ~ {round(self.stdev * 1000,1)} '
             f'[{self.recv}/{self.sent}, L:{self.lost}]'
         )
@@ -62,6 +65,5 @@ class Result:
                 f'Reply from {resp.src}: bytes={resp.size} '
                 f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
             )
-        elif resp.status == Response.TIMEDOUT:
-            return 'Request timed out.'
-        return ''
+        else:
+            return resp.error

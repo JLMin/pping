@@ -45,5 +45,4 @@ def ping(address, **kwargs):
                              size=size,
                              timeout=timeout,
                              ttl=ttl)
-    if responses:
-        return Result(address, responses)
+    return Result(address, responses)

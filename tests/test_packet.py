@@ -3,13 +3,13 @@ import pytest
 from pping.packet import Icmp, IPv4
 
 
-class TestIcmpPacket:
+class TestPacket:
 
     @pytest.mark.parametrize(
         'id_, seq, size', (
             (1, 4, 0),
             (2, 5, 11),
-            (3, 6, 16),
+            (3, 6, 16)
         )
     )
     def test_icmp_unpack_get_same_id_seq_and_size(self, id_, seq, size):
@@ -18,9 +18,6 @@ class TestIcmpPacket:
         assert unpack.id == id_
         assert unpack.seq == seq
         assert len(unpack.payload) == size
-
-
-class TestIpv4Packet:
 
     @pytest.mark.parametrize(
         'src, dst, ttl', (
