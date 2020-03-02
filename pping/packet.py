@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import struct
 import socket
 from collections import namedtuple
@@ -24,7 +21,7 @@ class Icmp:
                            ['type', 'code', 'checksom', 'id', 'seq', 'payload'])
 
     @staticmethod
-    def pack(*, id_=1, seq=1, size=32):
+    def pack(*, id_, seq, size):
         # Since we only send ICMP ping request, so the type and code are fixed,
         # Type for echo requeat is '8', code for echo is always '0'
         _type, _code = 8, 0
