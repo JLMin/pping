@@ -24,7 +24,7 @@ result = ping('www.example.com', # optional arguments
 ## Operation on the result
 
 ```python
->>> result
+>>> print(result)
 '''
 Reply from 93.184.216.34: bytes=32 time=151ms TTL=52
 Request timed out.

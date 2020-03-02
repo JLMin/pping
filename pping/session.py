@@ -5,9 +5,9 @@ import select
 import socket
 import threading
 import time
+from collections import namedtuple
 
-from .packet import Icmp
-from .result import Response, Result
+from .packet import Icmp, IPv4
 
 
 class Request:
@@ -29,7 +29,7 @@ class Request:
                 return None
             else:
                 id_ = threading.get_ident()
-                result = Result(address)
+                result = list()
                 for seq in range(1, repeat + 1):
                     packet = Icmp.pack(id_=id_, seq=seq, size=size)
                     response = Request.ping_once(conn, packet, timeout)
@@ -50,3 +50,24 @@ class Request:
                 return Response.valid(packet=recv_packet, rtt=rtt)
         except IndexError:
             return Response.timeout()
+
+
+class Response:
+
+    OK, TIMEDOUT = 'ok', 'timedout'
+
+    _Valid = namedtuple('Response', ['status', 'src', 'dst', 'ttl',
+                                     'size', 'seq', 'rtt'])
+
+    _Error = namedtuple('Response', ['status'])
+
+    @staticmethod
+    def valid(*, packet, rtt):
+        ipv4 = IPv4.unpack(packet[:20])
+        icmp = Icmp.unpack(packet[20:])
+        return Response._Valid(Response.OK, ipv4.src, ipv4.dst, ipv4.ttl,
+                               len(icmp.payload), icmp.seq, rtt)
+
+    @staticmethod
+    def timeout():
+        return Response._Error(Response.TIMEDOUT)

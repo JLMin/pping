@@ -3,23 +3,34 @@
 
 import statistics
 import socket
-from collections import namedtuple
 
-from .packet import Icmp, IPv4
+from .session import Response
 
 
 class Result:
 
-    def __init__(self, address):
+    __slots__ = ['responses', 'times', 'all_times',
+                 'hostname', 'hostalias', 'iplist',
+                 'sent', 'recv', 'lost',
+                 'max', 'min', 'avg', 'stdev']
+
+    def __init__(self, addr, resps):
         (self.hostname,
          self.hostalias,
-         self.iplist) = socket.gethostbyname_ex(address)
-        self.responses = list()
-        self.times = list()
-        self.all_times = list()
+         self.iplist) = socket.gethostbyname_ex(addr)
 
-    def __getitem__(self, key):
-        return self.responses[key]
+        self.responses = resps
+        self.times     = [r.rtt for r in resps if 'rtt' in r._fields]
+        self.all_times = [r.rtt if 'rtt' in r._fields else None for r in resps]
+
+        self.sent = len(self.responses)
+        self.recv = len(self.times)
+        self.lost = len(self.responses) - len(self.times)
+
+        self.max   = max(self.times) if self.times else 0
+        self.min   = min(self.times) if self.times else 0
+        self.avg   = statistics.mean(self.times) if self.times else 0
+        self.stdev = statistics.pstdev(self.times) if self.times else 0
 
     def __str__(self):
         return '\n'.join(Result._prettify(r) for r in self.responses) + (
@@ -35,55 +46,14 @@ class Result:
         )
 
     def __repr__(self):
-        return self.__str__()
+        return (
+            f'[{self.hostname}] > '
+            f'{round(self.avg * 1000)}ms ~ {round(self.stdev * 1000,1)} '
+            f'[{self.recv}/{self.sent}, L:{self.lost}]'
+        )
 
-    def append(self, response):
-        if response.status == Response.OK:
-            self.times.append(response.rtt)
-            self.all_times.append(response.rtt)
-        else:
-            self.all_times.append(None)
-        self.responses.append(response)
-
-    @property
-    def max(self):
-        try:
-            return max(self.times)
-        except ValueError:
-            return 0
-
-    @property
-    def min(self):
-        try:
-            return min(self.times)
-        except ValueError:
-            return 0
-
-    @property
-    def avg(self):
-        try:
-            return statistics.mean(self.times)
-        except statistics.StatisticsError:
-            return 0
-
-    @property
-    def stdev(self):
-        try:
-            return statistics.pstdev(self.times)
-        except statistics.StatisticsError:
-            return 0
-
-    @property
-    def sent(self):
-        return len(self.responses)
-
-    @property
-    def recv(self):
-        return len(self.times)
-
-    @property
-    def lost(self):
-        return len(self.responses) - len(self.times)
+    def __getitem__(self, key):
+        return self.responses[key]
 
     @staticmethod
     def _prettify(resp):
@@ -92,26 +62,6 @@ class Result:
                 f'Reply from {resp.src}: bytes={resp.size} '
                 f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
             )
-        else:
+        elif resp.status == Response.TIMEDOUT:
             return 'Request timed out.'
-
-
-class Response:
-
-    OK, TIMEDOUT = 'ok', 'timedout'
-
-    _Valid = namedtuple('Response', ['status', 'src', 'dst', 'ttl',
-                                     'size', 'seq', 'rtt'])
-
-    @staticmethod
-    def valid(*, packet, rtt):
-        ipv4 = IPv4.unpack(packet[:20])
-        icmp = Icmp.unpack(packet[20:])
-        return Response._Valid(Response.OK, ipv4.src, ipv4.dst, ipv4.ttl,
-                               len(icmp.payload), icmp.seq, rtt)
-
-    _Error = namedtuple('Response', ['status'])
-
-    @staticmethod
-    def timeout():
-        return Response._Error(Response.TIMEDOUT)
+        return ''

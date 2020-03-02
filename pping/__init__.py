@@ -12,34 +12,38 @@ ABOUT = {
 
 
 def ping(address, **kwargs):
-    from .request import Request
-    from .exceptions import (_int_positive, _int_positive_or_zero,
-                             _num_positive, _num_positive_or_zero)
+    from .session import Request
+    from .result import Result
+    from .exceptions import (_raise_if_not_int_positive,
+                             _raise_if_not_int_positive_or_zero,
+                             _raise_if_not_num_positive,
+                             _raise_if_not_num_positive_or_zero)
 
     # int > 0
     repeat = kwargs.get('repeat', 4)
-    _int_positive('repeat', repeat)
+    _raise_if_not_int_positive('repeat', repeat)
 
     # int | float >= 0
     interval = kwargs.get('interval', 1)
-    _num_positive_or_zero('interval', interval)
+    _raise_if_not_num_positive_or_zero('interval', interval)
 
     # int >= 0
     size = kwargs.get('size', 32)
-    _int_positive_or_zero('size', size)
+    _raise_if_not_int_positive_or_zero('size', size)
 
     # int | float > 0
     timeout = kwargs.get('timeout', 1)
-    _num_positive('timeout', timeout)
+    _raise_if_not_num_positive('timeout', timeout)
 
     # int > 0
     ttl = kwargs.get('ttl', 128)
-    _int_positive('ttl', ttl)
+    _raise_if_not_int_positive('ttl', ttl)
 
-    result = Request.ping(address=address,
-                          repeat=repeat,
-                          interval=interval,
-                          size=size,
-                          timeout=timeout,
-                          ttl=ttl)
-    return result
+    responses = Request.ping(address=address,
+                             repeat=repeat,
+                             interval=interval,
+                             size=size,
+                             timeout=timeout,
+                             ttl=ttl)
+    if responses:
+        return Result(address, responses)

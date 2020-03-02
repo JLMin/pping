@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-def _int_positive(name, value):
+def _raise_if_not_int_positive(name, value):
     # value : int > 0
     is_int = isinstance(value, int) and not isinstance(value, bool)
     if not (is_int and value > 0):
@@ -12,7 +12,7 @@ def _int_positive(name, value):
         raise ValueError(err_msg)
 
 
-def _int_positive_or_zero(name, value):
+def _raise_if_not_int_positive_or_zero(name, value):
     # value : int >= 0
     is_int = isinstance(value, int) and not isinstance(value, bool)
     if not (is_int and value >= 0):
@@ -23,7 +23,7 @@ def _int_positive_or_zero(name, value):
         raise ValueError(err_msg)
 
 
-def _num_positive(name, value):
+def _raise_if_not_num_positive(name, value):
     # value : int | float > 0
     is_num = isinstance(value, (int, float)) and not isinstance(value, bool)
     if not (is_num and value > 0):
@@ -34,7 +34,7 @@ def _num_positive(name, value):
         raise ValueError(err_msg)
 
 
-def _num_positive_or_zero(name, value):
+def _raise_if_not_num_positive_or_zero(name, value):
     # value : int | float >= 0
     is_num = isinstance(value, (int, float)) and not isinstance(value, bool)
     if not (is_num and value >= 0):
