@@ -37,15 +37,13 @@ class Result:
     def __repr__(self):
         return self.__str__()
 
-    @staticmethod
-    def _prettify(resp):
-        if resp.status == Response.OK:
-            return (
-                f'Reply from {resp.src}: bytes={resp.size} '
-                f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
-            )
+    def append(self, response):
+        if response.status == Response.OK:
+            self.times.append(response.rtt)
+            self.all_times.append(response.rtt)
         else:
-            return 'Request timed out.'
+            self.all_times.append(None)
+        self.responses.append(response)
 
     @property
     def max(self):
@@ -87,16 +85,19 @@ class Result:
     def lost(self):
         return len(self.responses) - len(self.times)
 
-    def append(self, response):
-        if response.status == Response.OK:
-            self.times.append(response.rtt)
-            self.all_times.append(response.rtt)
+    @staticmethod
+    def _prettify(resp):
+        if resp.status == Response.OK:
+            return (
+                f'Reply from {resp.src}: bytes={resp.size} '
+                f'time={round(resp.rtt * 1000)}ms TTL={resp.ttl}'
+            )
         else:
-            self.all_times.append(None)
-        self.responses.append(response)
+            return 'Request timed out.'
 
 
 class Response:
+
     OK, TIMEDOUT = 'ok', 'timedout'
 
     _Valid = namedtuple('Response', ['status', 'src', 'dst', 'ttl',
