@@ -25,7 +25,7 @@ class Result:
 
         self.sent = len(self.responses)
         self.recv = len(self.times)
-        self.lost = len(self.responses) - len(self.times)
+        self.lost = self.sent - self.recv
 
         self.max   = max(self.times) if self.times else 0
         self.min   = min(self.times) if self.times else 0
