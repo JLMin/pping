@@ -1,5 +1,5 @@
-import statistics
 import socket
+import statistics
 
 from .session import Response
 
