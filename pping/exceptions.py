@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 def _raise_if_not_int_positive(name, value):
     # value : int > 0
     is_int = isinstance(value, int) and not isinstance(value, bool)

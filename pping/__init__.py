@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 ABOUT = {
     'name': 'pping',
     'version': '0.0.4',
