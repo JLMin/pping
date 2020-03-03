@@ -3,7 +3,7 @@ import pytest
 from pping.session import Request, Response
 
 
-class TestPing:
+class TestSession:
 
     @pytest.mark.parametrize(
         'address', (
@@ -13,8 +13,7 @@ class TestPing:
         )
     )
     def test_ping_returns_only_one_result_with_invalid_address(self, address):
-        # set repeat 4 here so we can ensure when the address is invalid,
-        # only one result will created
+        # repeat > 1, assert len(result) == 1
         result = Request.ping(address=address, repeat=4, interval=1,
                               size=0, timeout=1, ttl=64)
         assert isinstance(result, list)
@@ -23,12 +22,10 @@ class TestPing:
 
     @pytest.mark.parametrize(
         'address, repeat, timeout', (
-            ('8.8.8.8', 2, 0.2),
+            ('127.0.0.1', 2, 0.5),
         )
     )
     def test_reliable_address(self, address, repeat, timeout):
-        # this is a very reliable address
-        # If somehow you can't connect to this server, this test will fail.
         result = Request.ping(address=address, repeat=repeat, interval=0,
                               size=32, timeout=timeout, ttl=64)
         assert isinstance(result, list)

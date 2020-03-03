@@ -14,14 +14,12 @@ class Request:
                            socket.SOCK_RAW,
                            socket.IPPROTO_ICMP) as conn:
             conn.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
-            result = list()
             try:
                 conn.connect((address, 0))
             except OSError as e:
-                response = Response.error(str(e))
-                result.append(response)
-                return result
+                return [Response.error(str(e))]
             else:
+                result = list()
                 for seq in range(1, repeat + 1):
                     packet = Icmp.pack(id_=id(conn), seq=seq, size=size)
                     response = Request.ping_once(conn, packet, timeout)
