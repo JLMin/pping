@@ -73,8 +73,7 @@ class IPv4:
 
     @staticmethod
     def pack(*, src, dst, ttl):
-        # Socket will automatically create ipv4 header.
-        # This method is used to construct a fake package for testing.
+        # This method is only used to construct a fake package for testing.
 
         # hard-coded, fake value
         f_vi = ((4 << 4) + 5) & 0xff

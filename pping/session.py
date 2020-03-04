@@ -19,27 +19,30 @@ class Request:
             except OSError as e:
                 return [Response.error(str(e))]
             else:
-                result = list()
-                for seq in range(1, repeat + 1):
-                    packet = Icmp.pack(id_=id(conn), seq=seq, size=size)
-                    response = Request.ping_once(conn, packet, timeout)
-                    result.append(response)
-                    if seq < repeat:
-                        time.sleep(interval)
-                return result
+                return list(Request._ping_multiple(conn, repeat, interval,
+                                                   size, timeout))
 
     @staticmethod
-    def ping_once(conn, packet, timeout):
-        try:
-            send_time = time.time()
-            conn.send(packet)
-            while True:
-                readable, _, _ = select.select([conn], [], [], timeout)
+    def _ping_multiple(conn, repeat, interval, size, timeout):
+        for seq in range(1, repeat + 1):
+            packet = Icmp.pack(id_=id(conn), seq=seq, size=size)
+            yield Request._ping_single(conn, packet, timeout)
+            if seq < repeat:
+                time.sleep(interval)
+
+    @staticmethod
+    def _ping_single(conn, packet, timeout):
+        send_time = time.time()
+        conn.send(packet)
+        while True:
+            readable, _, _ = select.select([conn], [], [], timeout)
+            try:
                 reply = readable[0].recv(1024)
-                rtt = time.time() - send_time
-                return Response.valid(packet=reply, rtt=rtt)
-        except IndexError:
-            return Response.timeout()
+            except IndexError:
+                return Response.timeout()
+            else:
+                return Response.valid(packet=reply,
+                                      rtt=time.time() - send_time)
 
 
 class Response:

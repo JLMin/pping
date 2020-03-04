@@ -17,8 +17,9 @@ class Result:
          self.iplist) = socket.gethostbyname_ex(addr)
 
         self.responses = resps
-        self.times     = [r.rtt for r in resps if 'rtt' in r._fields]
-        self.all_times = [r.rtt if 'rtt' in r._fields else None for r in resps]
+        self.times     = [r.rtt for r in resps if r.status == Response.OK]
+        self.all_times = [r.rtt if r.status == Response.OK else None
+                          for r in resps]
 
         self.sent = len(self.responses)
         self.recv = len(self.times)
