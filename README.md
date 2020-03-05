@@ -1,5 +1,5 @@
 [![PyPI](https://img.shields.io/badge/pypi-0.0.6-blue)](https://pypi.org/project/pping/)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-green)](https://github.com/JLMin/pping)
+[![Coverage](https://img.shields.io/badge/coverage-99%25-green)](https://github.com/JLMin/pping)
 [![GitHub license](https://img.shields.io/github/license/JLMin/pping)](https://github.com/JLMin/pping/blob/master/LICENSE)
 
 # pping
