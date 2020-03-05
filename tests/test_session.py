@@ -40,9 +40,9 @@ class TestSession:
         )
     )
     def test_timed_out(self, address, repeat, interval, timeout):
-        # This is a ping-able address, but I'm pretty sure we can receive
-        # no reply from it.
-        # If somehow you do get reply from it, this test will fail.
+        # This is a ping-able address, but I'm pretty sure we won't
+        # receive reply from it.
+        # This test will fail if somehow you do get response from it.
         result = Request.ping(address=address, repeat=repeat,
                               interval=interval, size=32,
                               timeout=timeout, ttl=64)
