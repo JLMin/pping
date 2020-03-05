@@ -1,6 +1,6 @@
 ABOUT = {
     'name': 'pping',
-    'version': '0.0.7',
+    'version': '0.0.8',
     'author': 'JLMin',
     'description': 'ping in python',
     'url': 'https://github.com/JLMin/pping',

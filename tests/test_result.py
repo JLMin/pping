@@ -24,29 +24,37 @@ class TestPacket:
 
     @pytest.mark.parametrize(
         'addr, resps', (
-            ('random.jmsjms.com', [Response._timeout()]),
+            ('127.0.0.1',
+             [Response._timeout(),
+              Response._Valid(Response.OK, '1.2.3.4', '5.6.7.8', 32,
+                              2, 1, 0.1)]),
         )
     )
-    def test_result_all_timed_out(self, addr, resps):
+    def test_result_timed_out(self, addr, resps):
         result = Result(addr, resps)
         assert result.hostname
-        assert result.hostalias
-        assert result.iplist
+        assert result.hostalias == []
+        assert result.iplist == ['127.0.0.1']
         assert result[0].status == Response.TIMEDOUT
+        assert 'statistics' in str(result)
         assert 'Request timed out.' in str(result)
-        assert 'error' in repr(result)
+        assert 'L:1' in repr(result)
 
-    def test_result_no_error(self):
-        addr = '127.0.0.1'
-        ip_pk = IPv4.pack(src=addr, dst=addr, ttl=32)
-        ic_pk = Icmp.pack(id_=1, seq=1, size=0)
-        packet = ip_pk + ic_pk
-        resps = [Response._valid(packet=packet, rtt=0.1)]
-
+    @pytest.mark.parametrize(
+        'addr, resps', (
+            ('127.0.0.1',
+             [Response._Valid(Response.OK, '1.2.3.4', '5.6.7.8', 32,
+                              2, 1, 0.1),
+              Response._Valid(Response.OK, '1.2.3.4', '5.6.7.8', 32,
+                              2, 2, 0.1)]),
+        )
+    )
+    def test_result_no_error(self, addr, resps):
         result = Result(addr, resps)
         assert result.hostname
         assert result.hostalias == []
         assert result.iplist == ['127.0.0.1']
         assert result[0].status == Response.OK
         assert 'statistics' in str(result)
-        assert 'error' not in repr(result)
+        assert 'Request timed out.' not in str(result)
+        assert 'L:0' in repr(result)
