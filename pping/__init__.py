@@ -11,30 +11,22 @@ ABOUT = {
 def ping(address, **kwargs):
     from .session import Request
     from .result import Result
-    from .exceptions import (_raise_if_not_int_positive,
-                             _raise_if_not_int_positive_or_zero,
-                             _raise_if_not_num_positive,
-                             _raise_if_not_num_positive_or_zero)
+    from .utils import verify_args
 
-    # int > 0
     repeat = kwargs.get('repeat', 4)
-    _raise_if_not_int_positive('repeat', repeat)
+    verify_args(arg=repeat, name='repeat', type_='integer', value='>0')
 
-    # int | float >= 0
     interval = kwargs.get('interval', 1)
-    _raise_if_not_num_positive_or_zero('interval', interval)
+    verify_args(arg=interval, name='interval', type_='number', value='>=0')
 
-    # int >= 0
     size = kwargs.get('size', 32)
-    _raise_if_not_int_positive_or_zero('size', size)
+    verify_args(arg=size, name='size', type_='integer', value='>=0')
 
-    # int | float > 0
     timeout = kwargs.get('timeout', 1)
-    _raise_if_not_num_positive('timeout', timeout)
+    verify_args(arg=timeout, name='timeout', type_='number', value='>0')
 
-    # int > 0
     ttl = kwargs.get('ttl', 128)
-    _raise_if_not_int_positive('ttl', ttl)
+    verify_args(arg=ttl, name='ttl', type_='integer', value='>0')
 
     responses = Request.ping(address=address,
                              repeat=repeat,

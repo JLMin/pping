@@ -2,6 +2,8 @@ import socket
 import struct
 from collections import namedtuple
 
+from .utils import checksum
+
 
 class Icmp:
     """
@@ -18,7 +20,7 @@ class Icmp:
     """
 
     ICMP_Data = namedtuple('ICMP_Data',
-                           ['type', 'code', 'checksom', 'id', 'seq', 'payload'])
+                           ['type', 'code', 'checksum', 'id', 'seq', 'payload'])
 
     @staticmethod
     def pack(*, id_, seq, size):
@@ -35,7 +37,7 @@ class Icmp:
         temp_packet = struct.pack(pack_format, _type, _code,
                                   temp_cksum, v_id, v_seq, v_data)
         # real packet, this one for send ping request
-        icmp_cksum  = _checksum(temp_packet)
+        icmp_cksum  = checksum(temp_packet)
         icmp_packet = struct.pack(pack_format, _type, _code,
                                   icmp_cksum, v_id, v_seq, v_data)
         return icmp_packet
@@ -100,16 +102,3 @@ class IPv4:
         ip_src = socket.inet_ntoa(ipv4_header[12:16])
         ip_dst = socket.inet_ntoa(ipv4_header[16:20])
         return IPv4.IPv4_Data(*unpacked_data, ip_src, ip_dst)
-
-
-def _checksum(packet):
-    cksum = 0
-    for i in range(0, len(packet), 2):
-        try:
-            cksum += packet[i] + (packet[i + 1] << 8)
-        except IndexError:  # packet size is odd
-            cksum += packet[i]
-        cksum = (cksum & 0xffff) + (cksum >> 16)
-    cksum = ~cksum & 0xffff
-    cksum = cksum >> 8 | (cksum << 8 & 0xff00)
-    return cksum
