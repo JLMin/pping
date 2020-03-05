@@ -1,6 +1,6 @@
 ABOUT = {
     'name': 'pping',
-    'version': '0.0.6',
+    'version': '0.0.7',
     'author': 'JLMin',
     'description': 'ping in python',
     'url': 'https://github.com/JLMin/pping',
@@ -9,6 +9,24 @@ ABOUT = {
 
 
 def ping(address, **kwargs):
+    """Send a ping request to the target address, returns the result.
+
+    :param address: str           Host name or IPv4 address.
+    :param repeat: int            Number of echo requests to send.
+    :param interval: int | float  Time in seconds interval between each request.
+    :param size: int              Send buffer size in bytes.
+    :param timeout: int | float   Timeout in seconds to wait for each reply.
+    :param ttl: int               Time To Live.
+
+    :return: :class:`Result` object
+
+    Usage::
+      >>> from pping import ping
+      >>> result = ping('example.com')
+      >>> result
+      Result of [example.com] > 168ms ~ 2.2 [4/4, L:0]
+    """
+
     from .session import Request
     from .result import Result
     from .utils import verify_args

@@ -14,7 +14,7 @@ class Result:
     def __init__(self, addr, resps):
         (self.hostname,
          self.hostalias,
-         self.iplist) = socket.gethostbyname_ex(addr)
+         self.iplist) = Result._get_host_info(addr)
 
         self.responses = resps
         self.times     = [r.rtt for r in resps if r.status == Response.OK]
@@ -48,14 +48,27 @@ class Result:
             return self.responses[0].error
 
     def __repr__(self):
-        return (
-            f'{self.__class__.__name__} of [{self.hostname}] > '
-            f'{round(self.avg * 1000)}ms ~ {round(self.stdev * 1000,1)} '
-            f'[{self.recv}/{self.sent}, L:{self.lost}]'
-        )
+        if self.recv > 0:
+            return (
+                f'{self.__class__.__name__} of [{self.hostname}] > '
+                f'{round(self.avg * 1000)}ms ~ {round(self.stdev * 1000,1)} '
+                f'[{self.recv}/{self.sent}, L:{self.lost}]'
+            )
+        else:
+            return (
+                f'{self.__class__.__name__} of [{self.hostname}] error > '
+                f'{self.responses[0].error}'
+            )
 
     def __getitem__(self, key):
         return self.responses[key]
+
+    @staticmethod
+    def _get_host_info(addr):
+        try:
+            return socket.gethostbyname_ex(addr)
+        except OSError:
+            return addr, [], []
 
     @staticmethod
     def _prettify(resp):
