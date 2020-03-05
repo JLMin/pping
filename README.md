@@ -1,3 +1,7 @@
+[![PyPI](https://img.shields.io/pypi/v/pping)](https://pypi.org/project/pping/)
+[![GitHub license](https://img.shields.io/github/license/JLMin/pping)](https://github.com/JLMin/pping/blob/master/LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-green)](https://github.com/JLMin/pping)
+
 # pping
 
 **ping** in python
