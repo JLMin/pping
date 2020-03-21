@@ -18,7 +18,7 @@ def verify_args(*, arg, name, type_, value):
         'Expect the "{name}" to be a {type_}({value}), got'
         ': <{type_name}> \'{arg}\''
     )
-    if not _type_check(type_, arg and _value_check(value, arg)):
+    if not (_type_check(type_, arg) and _value_check(value, arg)):
         err_msg = err_fmt.format(name=name,
                                  value=value,
                                  type_=type_,
