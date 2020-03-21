@@ -19,8 +19,7 @@ class Icmp:
     +----------------------------------+
     """
 
-    ICMP_Data = namedtuple('ICMP_Data',
-                           ['type', 'code', 'checksum', 'id', 'seq', 'payload'])
+    ICMP_Data = namedtuple('ICMP_Data', 'type code checksum id seq payload')
 
     @staticmethod
     def pack(*, id_, seq, size):
@@ -64,14 +63,13 @@ class IPv4:
     |  TTL.  |protocol|    checksum    |
     +--------+--------+----------------+
     |        Source IP address         |
-    +--------+--------+----------------+
+    +----------------------------------+
     |      Destination IP address      |
-    +--------+--------+----------------+
+    +----------------------------------+
     """
 
-    IPv4_Data = namedtuple('IPv4_Data',
-                           ['ver', 'dscp', 'length', 'id', 'flag', 'ttl',
-                            'protocaol', 'checksum', 'src', 'dst'])
+    IPv4_Data = namedtuple(
+        'IPv4_Data', 'ver dscp length id flag ttl protocaol checksum src dst')
 
     @staticmethod
     def pack(*, src, dst, ttl):

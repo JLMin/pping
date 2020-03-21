@@ -41,18 +41,15 @@ class Request:
             except IndexError:
                 return Response._timeout()
             else:
-                return Response._valid(packet=reply,
-                                       rtt=time() - send_time)
+                return Response._valid(packet=reply, rtt=time() - send_time)
 
 
 class Response:
 
     OK, TIMEDOUT, ERROR = 'ok', 'timedout', 'error'
 
-    _Valid = namedtuple('Response', ['status', 'src', 'dst', 'ttl',
-                                     'size', 'seq', 'rtt'])
-
-    _Error = namedtuple('Response', ['status', 'error'])
+    _Valid = namedtuple('Response', 'status src dst ttl size seq rtt')
+    _Error = namedtuple('Response', 'status error')
 
     @staticmethod
     def _valid(*, packet, rtt):
