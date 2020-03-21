@@ -69,7 +69,7 @@ class IPv4:
     """
 
     IPv4_Data = namedtuple(
-        'IPv4_Data', 'ver dscp length id flag ttl protocaol checksum src dst')
+        'IPv4_Data', 'ver dscp length id flag ttl protocol checksum src dst')
 
     @staticmethod
     def pack(*, src, dst, ttl):
