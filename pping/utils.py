@@ -1,5 +1,3 @@
-
-
 def checksum(packet):
     cksum = 0
     for i in range(0, len(packet), 2):
