@@ -1,7 +1,6 @@
 import pytest
 
 from pping.result import Result
-from pping.packet import Icmp, IPv4
 from pping.session import Response
 
 
