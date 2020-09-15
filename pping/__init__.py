@@ -11,16 +11,16 @@ ABOUT = {
 def ping(address, **kwargs):
     """Send a ping request to the target address, returns the result.
 
-    :param address: str           Host name or IPv4 address.
-    :param repeat: int            Number of echo requests to send.
-    :param interval: int | float  Time in seconds interval between each request.
-    :param size: int              Send buffer size in bytes.
-    :param timeout: int | float   Timeout in seconds to wait for each reply.
-    :param ttl: int               Time To Live.
+    param address:  str            Host name or IPv4 address.
+    param repeat:   int            Number of echo requests to send.
+    param interval: int | float    Time in seconds interval between each request.
+    param size:     int            Send buffer size in bytes.
+    param timeout:  int | float    Timeout in seconds to wait for each reply.
+    param ttl:      int            Time To Live.
 
-    :return: :class:`Result` object
+    return: :class:`Result` object
 
-    Usage::
+    Usage:
       >>> from pping import ping
       >>> result = ping('example.com')
       >>> result
