@@ -1,6 +1,11 @@
+from .utils import verify_args
+from .result import Result
+from .session import Request
+
+
 ABOUT = {
     'name': 'pping',
-    'version': '0.0.8',
+    'version': '0.0.9',
     'author': 'JLMin',
     'description': 'ping in python',
     'url': 'https://github.com/JLMin/pping',
@@ -26,10 +31,6 @@ def ping(address, **kwargs):
       >>> result
       Result of [example.com] > 168ms ~ 2.2 [4/4, L:0]
     """
-
-    from .session import Request
-    from .result import Result
-    from .utils import verify_args
 
     repeat = kwargs.get('repeat', 4)
     verify_args(arg=repeat, name='repeat', type_='integer', value='>0')
